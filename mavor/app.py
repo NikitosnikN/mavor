@@ -36,11 +36,10 @@ class Mavor(AbstractApp):
 
     async def _create_server(self) -> "asyncio.AbstractServer":
         self._server = await asyncio.start_server(
-            client_connected_cb=self._request_builder.handle,
+            client_connected_cb=self._request_builder.build,
             host=self._host,
             port=self._port,
-            # loop=self._loop,
-            # limit=self._limit
+            loop=self._loop
         )
         return self._server
 
