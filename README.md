@@ -1,7 +1,7 @@
 # Mavor
 > One more python web server for fun and learning
 
-## Main aims
+## Main goals
 
 1. Python 3.7+
 2. Async server
