@@ -1,4 +1,4 @@
-# Mavor (python web server)
+# Mavor
 > One more python web server for fun and learning
 
 ## Main aims
