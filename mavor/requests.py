@@ -11,7 +11,6 @@ class Request(AbstractRequest):
             self,
             protocol: str,
             path: str,
-            schema: str,
             method: str,
             headers: dict,
             query_string: dict = None,
@@ -19,11 +18,24 @@ class Request(AbstractRequest):
             body: Any = None,
             **kwargs
     ):
-        super().__init__(protocol, path, schema, method, headers, query_string, raw_body)
-        self._body = body
+        super().__init__(
+            protocol=protocol,
+            path=path,
+            method=method,
+            headers=headers,
+            query_string=query_string,
+            raw_body=raw_body
+        )
+        self.body = body
 
 
 class RequestBuilder(AbstractRequestBuilder):
+    def __init__(
+            self,
+            app,
+    ):
+        self._app = app
+
     @classmethod
     async def _parse_starting_line(
             cls,
@@ -42,7 +54,7 @@ class RequestBuilder(AbstractRequestBuilder):
     ) -> None:
         url_data = parse.urlparse(params["uri"])
         params["path"] = url_data.path
-        params["qs"] = parse.parse_qs(url_data.query)
+        params["query_string"] = parse.parse_qs(url_data.query)
         return None
 
     @classmethod
@@ -71,6 +83,7 @@ class RequestBuilder(AbstractRequestBuilder):
             reader: "asyncio.StreamReader",
             params: dict
     ) -> None:
+        # TODO fix freeze cause of no end
         params["raw_body"] = await reader.read()
         return None
 
@@ -102,4 +115,4 @@ class RequestBuilder(AbstractRequestBuilder):
         await self._parse_headers(reader, params)
         await self._parse_raw_payload(reader, params)
         await self._prettify_payload(params)
-        return Request(**params)
+        return self._app._request_class(**params)  # noqa
